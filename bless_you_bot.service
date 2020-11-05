@@ -1,0 +1,12 @@
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv
+ExecStart=/srv/bless_you_bot
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
