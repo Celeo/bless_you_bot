@@ -25,6 +25,7 @@ static OTHER_IGNORE_PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     vec![
         Regex::new(r"^[hue]{5,}$").unwrap(),
         Regex::new(r"^[lo]{5,}$").unwrap(),
+        Regex::new(r"^https?://").unwrap(),
     ]
 });
 
@@ -95,5 +96,33 @@ async fn main() {
 
     if let Err(e) = client.start().await {
         error!("Error starting client: {}", e);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_incoherent_space() {
+        assert!(!is_incoherent("a a"));
+    }
+
+    #[test]
+    fn test_is_incoherent_length() {
+        assert!(!is_incoherent("a"));
+    }
+
+    #[test]
+    fn test_is_incoherent_real_word() {
+        assert!(!is_incoherent("dictionary"));
+    }
+
+    #[test]
+    fn test_is_incoherent_patterns() {
+        assert!(!is_incoherent("lolololloo"));
+        assert!(!is_incoherent("hueuhueuhuhe"));
+        assert!(!is_incoherent("http://example.com"));
+        assert!(!is_incoherent("https://google.com"));
     }
 }
