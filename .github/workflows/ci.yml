@@ -27,14 +27,14 @@ jobs:
       with:
         path: target
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    - name: Pull git submodule
+      run: git submodule update --init --recursive
     - name: Install clippy
       run: rustup component add clippy
     - name: Clippy
       run: cargo clippy -- -D warnings
     - name: Test
       run: cargo test --verbose --all
-    - name: Pull git submodule
-      run: git submodule update --init --recursive
     - name: Build release binary
       run: cargo build --release
     - name: Move binary
