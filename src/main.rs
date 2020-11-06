@@ -26,6 +26,8 @@ static OTHER_IGNORE_PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
         Regex::new(r"^[hue]{5,}$").unwrap(),
         Regex::new(r"^[lo]{5,}$").unwrap(),
         Regex::new(r"^https?://").unwrap(),
+        Regex::new(r"^re{5,}").unwrap(),
+        Regex::new(r"^<:\w+:\d+>$").unwrap(),
     ]
 });
 
@@ -61,7 +63,6 @@ impl EventHandler for Handler {
 
     async fn message(&self, context: Context, message: Message) {
         if !MONITORED_USER_IDS.contains(message.author.id.as_u64()) {
-            debug!("Not responding to message from {}", message.author.name);
             return;
         }
         if !is_incoherent(&message.content) {
@@ -124,5 +125,7 @@ mod tests {
         assert!(!is_incoherent("hueuhueuhuhe"));
         assert!(!is_incoherent("http://example.com"));
         assert!(!is_incoherent("https://google.com"));
+        assert!(!is_incoherent("reeeeeeeeee"));
+        assert!(!is_incoherent("<:Screampackman2:754148436906999888>"));
     }
 }
