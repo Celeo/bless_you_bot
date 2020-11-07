@@ -31,8 +31,16 @@ static OTHER_IGNORE_PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     ]
 });
 
+fn strip_formatting(content: &str) -> String {
+    content
+        .replace('*', "")
+        .replace('_', "")
+        .replace('~', "")
+        .replace('`', "")
+}
+
 fn is_incoherent(content: &str) -> bool {
-    let content = content.to_lowercase();
+    let content = strip_formatting(&content.to_lowercase());
     if content.contains(' ') {
         debug!("Message contains a space");
         return false;
@@ -70,6 +78,7 @@ impl EventHandler for Handler {
         if !MONITORED_USER_IDS.contains(message.author.id.as_u64()) {
             return;
         }
+        debug!("Message: {}", message.content);
         if !is_incoherent(&message.content.to_lowercase()) {
             return;
         }
@@ -107,7 +116,7 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::is_incoherent;
+    use super::{is_incoherent, strip_formatting};
 
     #[test]
     fn test_is_incoherent_space() {
@@ -133,5 +142,16 @@ mod tests {
         assert!(!is_incoherent("https://google.com"));
         assert!(!is_incoherent("reeeeeeeeee"));
         assert!(!is_incoherent("<:Screampackman2:754148436906999888>"));
+    }
+
+    #[test]
+    fn test_strip_formatting() {
+        assert_eq!("word", strip_formatting("word"));
+        assert_eq!("word", strip_formatting("*word*"));
+        assert_eq!("word", strip_formatting("**word**"));
+        assert_eq!("word", strip_formatting("_word_"));
+        assert_eq!("word", strip_formatting("~~word~~"));
+        assert_eq!("word", strip_formatting("`word`"));
+        assert_eq!("word", strip_formatting("***word***"));
     }
 }
