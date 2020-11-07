@@ -40,6 +40,10 @@ fn is_incoherent(content: &str) -> bool {
         debug!("Message is under {} chars long", MINIMUM_MESSAGE_LENGTH);
         return false;
     }
+    // It is actually faster to use `.contains` rather than looping through
+    // the vec's (pre-sorted) items and checking the first letter in the word
+    // to see if the search has already gone past the first letter in the checked
+    // word, i.e. if the loop is checking 'l' but `content` starts with an 'i'.
     if WORDS.contains(&content) {
         debug!("Message found in word bank");
         return false;
@@ -102,7 +106,7 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::is_incoherent;
 
     #[test]
     fn test_is_incoherent_space() {
