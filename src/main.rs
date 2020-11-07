@@ -32,6 +32,7 @@ static OTHER_IGNORE_PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
 });
 
 fn is_incoherent(content: &str) -> bool {
+    let content = content.to_lowercase();
     if content.contains(' ') {
         debug!("Message contains a space");
         return false;
@@ -44,12 +45,12 @@ fn is_incoherent(content: &str) -> bool {
     // the vec's (pre-sorted) items and checking the first letter in the word
     // to see if the search has already gone past the first letter in the checked
     // word, i.e. if the loop is checking 'l' but `content` starts with an 'i'.
-    if WORDS.contains(&content) {
+    if WORDS.contains(&content.as_str()) {
         debug!("Message found in word bank");
         return false;
     }
     for pattern in OTHER_IGNORE_PATTERNS.iter() {
-        if pattern.is_match(content) {
+        if pattern.is_match(&content) {
             debug!("Matches ignore pattern");
             return false;
         }
@@ -69,7 +70,7 @@ impl EventHandler for Handler {
         if !MONITORED_USER_IDS.contains(message.author.id.as_u64()) {
             return;
         }
-        if !is_incoherent(&message.content) {
+        if !is_incoherent(&message.content.to_lowercase()) {
             return;
         }
         if let Err(e) = message.react(&context, '🤧').await {
@@ -120,6 +121,7 @@ mod tests {
 
     #[test]
     fn test_is_incoherent_real_word() {
+        assert!(!is_incoherent("DicTiONAry"));
         assert!(!is_incoherent("dictionary"));
     }
 
