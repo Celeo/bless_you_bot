@@ -24,6 +24,7 @@ static MONITORED_USER_IDS: Lazy<Vec<u64>> = Lazy::new(|| {
 static OTHER_IGNORE_PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     vec![
         Regex::new(r"^[hue]{5,}$").unwrap(),
+        Regex::new(r"^[bha]{5,}$").unwrap(),
         Regex::new(r"^[lo]{5,}$").unwrap(),
         Regex::new(r"^https?://").unwrap(),
         Regex::new(r"^re{5,}").unwrap(),
@@ -136,6 +137,7 @@ mod tests {
 
     #[test]
     fn test_is_incoherent_patterns() {
+        assert!(!is_incoherent("bahahaha"));
         assert!(!is_incoherent("lolololloo"));
         assert!(!is_incoherent("hueuhueuhuhe"));
         assert!(!is_incoherent("http://example.com"));
