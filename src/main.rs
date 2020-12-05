@@ -40,8 +40,17 @@ fn strip_formatting(content: &str) -> String {
         .replace('`', "")
 }
 
+fn strip_punctuation(content: &str) -> String {
+    content.replace('?', "").replace('!', "").replace('"', "")
+}
+
 fn is_incoherent(content: &str) -> bool {
-    let content = strip_formatting(&content.to_lowercase());
+    let content = {
+        let mut content = content.to_lowercase();
+        content = strip_formatting(&content);
+        content = strip_punctuation(&content);
+        content
+    };
     if content.contains(' ') {
         debug!("Message contains a space");
         return false;
@@ -117,7 +126,7 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::{is_incoherent, strip_formatting};
+    use super::{is_incoherent, strip_formatting, strip_punctuation};
 
     #[test]
     fn test_is_incoherent_space() {
@@ -155,5 +164,12 @@ mod tests {
         assert_eq!("word", strip_formatting("~~word~~"));
         assert_eq!("word", strip_formatting("`word`"));
         assert_eq!("word", strip_formatting("***word***"));
+    }
+
+    #[test]
+    fn test_strip_punctuation() {
+        assert_eq!("word", strip_punctuation("\"word\""));
+        assert_eq!("word", strip_punctuation("word!!"));
+        assert_eq!("word", strip_punctuation("word???"));
     }
 }
